@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router'
 
-export default function PaginaProduto({ produtos, onAdicionar }) {
+export default function PaginaProduto({ produtos, onAdicionar, onRegistrarAviso }) {
   const { id } = useParams()
   const produto = produtos.find((item) => item.id === id)
   const [formularioAviso, setFormularioAviso] = useState({ nome: '', email: '' })
   const [avisoEnviado, setAvisoEnviado] = useState(false)
+  const estoqueAtual = Number(produto?.estoque ?? 0)
 
   if (!produto) {
     return (
@@ -18,6 +19,7 @@ export default function PaginaProduto({ produtos, onAdicionar }) {
     )
   }
 
+  const valorProduto = Number(produto.price ?? 0)
   const relacionados = produtos
     .filter((item) => item.category === produto.category && item.id !== produto.id)
     .slice(0, 4)
@@ -29,6 +31,11 @@ export default function PaginaProduto({ produtos, onAdicionar }) {
 
   function handleSubmitAviso(evento) {
     evento.preventDefault()
+
+    if (onRegistrarAviso) {
+      onRegistrarAviso(produto.id, formularioAviso.nome, formularioAviso.email)
+    }
+
     setAvisoEnviado(true)
     setFormularioAviso({ nome: '', email: '' })
   }
@@ -51,19 +58,19 @@ export default function PaginaProduto({ produtos, onAdicionar }) {
           <p className="card-avaliacao">
             ★ {produto.rating.rate} <span>({produto.rating.count} avaliações)</span>
           </p>
-          <p className="detalhe-preco">R$ {produto.price.toFixed(2).replace('.', ',')}</p>
+          <p className="detalhe-preco">R$ {valorProduto.toFixed(2).replace('.', ',')}</p>
           <p className="detalhe-descricao">{produto.description}</p>
-          <p className="detalhe-estoque">{produto.estoque} unidades disponíveis</p>
+          <p className="detalhe-estoque">{estoqueAtual} unidades disponíveis</p>
 
           <button
             className="botao botao-grande"
             onClick={() => onAdicionar(produto)}
-            disabled={produto.estoque === 0}
+            disabled={estoqueAtual === 0}
           >
             Adicionar ao carrinho
           </button>
 
-          {produto.estoque === 0 && (
+          {estoqueAtual === 0 && (
             <div className="aviso-esgotado">
               <h2>Avise-me quando voltar</h2>
 

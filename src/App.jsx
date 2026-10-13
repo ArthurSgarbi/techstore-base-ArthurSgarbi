@@ -17,6 +17,14 @@ export default function App() {
   const [carrinho, setCarrinho] = useState([])
   const [clientes, setClientes] = useState([])
   const [clienteAtualId, setClienteAtualId] = useState(null)
+  const [avisos, setAvisos] = useState(() => {
+    const salvos = localStorage.getItem('techstore-avisos')
+    return salvos ? JSON.parse(salvos) : []
+  })
+
+  useEffect(() => {
+    localStorage.setItem('techstore-avisos', JSON.stringify(avisos))
+  }, [avisos])
 
   useEffect(() => {
     buscarProdutos()
@@ -50,6 +58,16 @@ export default function App() {
 
   const clienteAtual = clientes.find((cliente) => cliente.id === clienteAtualId)
 
+  function registrarAviso(produtoId, nome, email) {
+    setAvisos((atual) => {
+      if (atual.some((aviso) => aviso.produtoId === produtoId && aviso.email === email)) {
+        return atual
+      }
+
+      return [...atual, { produtoId, nome, email }]
+    })
+  }
+
   return (
     <div className="app">
       <RolarParaTopo />
@@ -67,7 +85,13 @@ export default function App() {
             />
             <Route
               path="/produto/:id"
-              element={<PaginaProduto produtos={produtos} onAdicionar={adicionarAoCarrinho} />}
+              element={
+                <PaginaProduto
+                  produtos={produtos}
+                  onAdicionar={adicionarAoCarrinho}
+                  onRegistrarAviso={registrarAviso}
+                />
+              }
             />
             <Route
               path="/carrinho"
@@ -81,7 +105,7 @@ export default function App() {
                 />
               }
             />
-            <Route path="/estoque" element={<Estoque produtos={produtos} />} />
+            <Route path="/estoque" element={<Estoque produtos={produtos} avisos={avisos} />} />
           </Routes>
         )}
       </main>
