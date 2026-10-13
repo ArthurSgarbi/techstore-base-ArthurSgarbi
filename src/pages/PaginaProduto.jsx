@@ -1,8 +1,11 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router'
 
 export default function PaginaProduto({ produtos, onAdicionar }) {
   const { id } = useParams()
   const produto = produtos.find((item) => item.id === id)
+  const [formularioAviso, setFormularioAviso] = useState({ nome: '', email: '' })
+  const [avisoEnviado, setAvisoEnviado] = useState(false)
 
   if (!produto) {
     return (
@@ -18,6 +21,17 @@ export default function PaginaProduto({ produtos, onAdicionar }) {
   const relacionados = produtos
     .filter((item) => item.category === produto.category && item.id !== produto.id)
     .slice(0, 4)
+
+  function handleChangeAviso(evento) {
+    const { name, value } = evento.target
+    setFormularioAviso((anterior) => ({ ...anterior, [name]: value }))
+  }
+
+  function handleSubmitAviso(evento) {
+    evento.preventDefault()
+    setAvisoEnviado(true)
+    setFormularioAviso({ nome: '', email: '' })
+  }
 
   return (
     <section>
@@ -48,6 +62,46 @@ export default function PaginaProduto({ produtos, onAdicionar }) {
           >
             Adicionar ao carrinho
           </button>
+
+          {produto.estoque === 0 && (
+            <div className="aviso-esgotado">
+              <h2>Avise-me quando voltar</h2>
+
+              <form className="aviso-form" onSubmit={handleSubmitAviso}>
+                <label className="aviso-campo">
+                  <span>Nome</span>
+                  <input
+                    type="text"
+                    name="nome"
+                    value={formularioAviso.nome}
+                    onChange={handleChangeAviso}
+                    placeholder="Seu nome"
+                    required
+                  />
+                </label>
+
+                <label className="aviso-campo">
+                  <span>E-mail</span>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formularioAviso.email}
+                    onChange={handleChangeAviso}
+                    placeholder="seu@email.com"
+                    required
+                  />
+                </label>
+
+                <button type="submit" className="botao botao-secundario">
+                  Avise-me
+                </button>
+              </form>
+
+              {avisoEnviado && (
+                <p className="mensagem-aviso">Tudo certo! Vamos te avisar quando o produto voltar.</p>
+              )}
+            </div>
+          )}
 
           <ul className="detalhe-garantias">
             <li>Troca grátis em até 30 dias</li>
