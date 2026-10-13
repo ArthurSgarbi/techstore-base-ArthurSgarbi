@@ -16,6 +16,7 @@ export default function Carrinho({ carrinho, produtos, clienteAtual, onAdicionar
 
   const sugestoes = produtos
     .filter((produto) => !carrinho.find((item) => item.id === produto.id))
+    .filter((produto) => Number.isFinite(Number(produto.price)) && Number(produto.price) > 0)
     .slice(0, 3)
 
   function aplicarCupom(evento) {
