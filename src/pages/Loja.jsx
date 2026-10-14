@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import ProdutoCard from '../components/ProdutoCard'
+import { formatarPreco } from '../utils/formatarPreco'
 
 const CATEGORIAS = [
   { id: 'todas', nome: 'Todas' },
@@ -9,9 +10,15 @@ const CATEGORIAS = [
   { id: 'casa', nome: 'Casa' },
 ]
 
-export default function Loja({ produtos, onAdicionar }) {
+export default function Loja({ produtos, carrinho = [], clienteAtual, onAdicionar }) {
   const [categoria, setCategoria] = useState('todas')
   const [produtosVisiveis, setProdutosVisiveis] = useState(produtos)
+
+  const valorCarrinho = (carrinho || []).reduce((total, produto) => total + Number(produto.price || 0), 0)
+  const clienteJaComprouCamiseta =
+    Boolean(clienteAtual) && Number(clienteAtual.pedidosAnteriores ?? 0) > 0
+  const valorFaltante = Number(Math.max(0, 200 - valorCarrinho).toFixed(2))
+  const mostrarAlertaFrete = clienteJaComprouCamiseta && valorCarrinho < 200
 
   useEffect(() => {
     const produtosDisponiveis = (produtos || []).filter((produto) => {
@@ -33,6 +40,13 @@ export default function Loja({ produtos, onAdicionar }) {
         <p className="sobretitulo">Coleção de outubro</p>
         <h1>Produtos</h1>
       </div>
+
+      {mostrarAlertaFrete && (
+        <div className="alerta-frete">
+          <strong>Falta pouco para o frete grátis voltar!</strong>
+          <span>Você ainda precisa gastar {formatarPreco(valorFaltante)} para atingir R$ 200,00.</span>
+        </div>
+      )}
 
       <div className="filtros" role="group" aria-label="Filtrar por categoria">
         {CATEGORIAS.map((item) => (

@@ -132,6 +132,27 @@ h2 {
   margin: 0;
 }
 
+.alerta-frete {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-1);
+  padding: var(--espaco-4) var(--espaco-5);
+  margin-bottom: var(--espaco-5);
+  border: 1px solid #dfeecf;
+  border-radius: var(--raio);
+  background: var(--cor-frete-fundo);
+  color: var(--cor-frete);
+  font-weight: 600;
+}
+
+.alerta-frete strong {
+  font-size: 1rem;
+}
+
+.alerta-frete span {
+  font-size: 0.95rem;
+}
+
 /* Cabeçalho */
 
 .header {

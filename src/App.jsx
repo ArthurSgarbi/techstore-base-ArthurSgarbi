@@ -81,7 +81,14 @@ export default function App() {
           <Routes>
             <Route
               path="/"
-              element={<Loja produtos={produtos} onAdicionar={adicionarAoCarrinho} />}
+              element={
+                <Loja
+                  produtos={produtos}
+                  carrinho={carrinho}
+                  clienteAtual={clienteAtual}
+                  onAdicionar={adicionarAoCarrinho}
+                />
+              }
             />
             <Route
               path="/produto/:id"
