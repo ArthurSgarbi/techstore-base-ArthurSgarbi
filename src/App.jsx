@@ -14,13 +14,20 @@ export default function App() {
   const [produtos, setProdutos] = useState([])
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState(null)
-  const [carrinho, setCarrinho] = useState([])
+  const [carrinho, setCarrinho] = useState(() => {
+    const salvos = localStorage.getItem('techstore-carrinho')
+    return salvos ? JSON.parse(salvos) : []
+  })
   const [clientes, setClientes] = useState([])
   const [clienteAtualId, setClienteAtualId] = useState(null)
   const [avisos, setAvisos] = useState(() => {
     const salvos = localStorage.getItem('techstore-avisos')
     return salvos ? JSON.parse(salvos) : []
   })
+
+  useEffect(() => {
+    localStorage.setItem('techstore-carrinho', JSON.stringify(carrinho))
+  }, [carrinho])
 
   useEffect(() => {
     localStorage.setItem('techstore-avisos', JSON.stringify(avisos))
@@ -39,14 +46,14 @@ export default function App() {
   }, [])
 
   function adicionarAoCarrinho(produto) {
-    setCarrinho(carrinho.concat(produto))
+    setCarrinho((atual) => atual.concat(produto))
   }
 
   function removerUmaUnidade(produtoId) {
     // Remove só a primeira unidade encontrada do produto
     let removido = false
-    setCarrinho(
-      carrinho.filter((produto) => {
+    setCarrinho((atual) =>
+      atual.filter((produto) => {
         if (!removido && produto.id === produtoId) {
           removido = true
           return false

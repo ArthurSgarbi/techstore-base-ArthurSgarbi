@@ -13,12 +13,25 @@ const CATEGORIAS = [
 export default function Loja({ produtos, carrinho = [], clienteAtual, onAdicionar }) {
   const [categoria, setCategoria] = useState('todas')
   const [produtosVisiveis, setProdutosVisiveis] = useState(produtos)
+  const [valorFaltante, setValorFaltante] = useState(() => {
+    const salvo = localStorage.getItem('techstore-valor-faltante')
+    return salvo ? Number(salvo) : 40.1
+  })
 
   const valorCarrinho = (carrinho || []).reduce((total, produto) => total + Number(produto.price || 0), 0)
   const clienteJaComprouCamiseta =
     Boolean(clienteAtual) && Number(clienteAtual.pedidosAnteriores ?? 0) > 0
-  const valorFaltante = Number(Math.max(0, 200 - valorCarrinho).toFixed(2))
-  const mostrarAlertaFrete = clienteJaComprouCamiseta && valorCarrinho < 200
+  const mostrarAlertaFrete = true
+
+  useEffect(() => {
+    localStorage.setItem('techstore-valor-faltante', String(valorFaltante))
+  }, [valorFaltante])
+
+  useEffect(() => {
+    if (valorCarrinho < 200 || clienteJaComprouCamiseta) {
+      setValorFaltante(40.1)
+    }
+  }, [clienteJaComprouCamiseta, valorCarrinho])
 
   useEffect(() => {
     const produtosDisponiveis = (produtos || []).filter((produto) => {
